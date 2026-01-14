@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Dash - Level Select</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0015 0%, #1a0033 50%, #0f001f 100%);
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-family: 'Orbitron', monospace;
+            font-size: 82px;
+            font-weight: 900;
+            color: #ff00ff;
+            text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff, 0 0 90px #ff00ff;
+            margin-bottom: 10px;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff; }
+            50% { text-shadow: 0 0 40px #ff00ff, 0 0 80px #ff00ff, 0 0 120px #ff00ff; }
+        }
+
+        .subtitle {
+            font-size: 26px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            font-weight: 600;
+        }
+
+        .levels-container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .level-card {
+            background: rgba(255, 0, 255, 0.1);
+            border: 3px solid #ff00ff;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+            padding: 30px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.6);
+            border-color: #00ffff;
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .level-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 48px;
+            font-weight: 900;
+            color: #ff00ff;
+            text-shadow: 0 0 20px #ff00ff;
+        }
+
+        .level-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            flex: 1;
+            margin-left: 30px;
+        }
+
+        .level-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-badge {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-complete {
+            background: linear-gradient(135deg, #00ff00, #00ffff);
+            color: #000;
+            box-shadow: 0 0 20px #00ff00;
+        }
+
+        .status-incomplete {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 2px solid #666;
+        }
+
+        .status-locked {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff5555;
+            border: 2px solid #ff0000;
+        }
+
+        .level-info {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        .info-label {
+            color: #00ffff;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            transition: width 0.5s;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 14px;
+            color: #fff;
+            text-shadow: 0 0 10px #000;
+        }
+
+        .play-button {
+            font-family: 'Orbitron', monospace;
+            font-size: 22px;
+            font-weight: 900;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            border: none;
+            color: #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .play-button:hover {
+            transform: scale(1.02);
+        }
+
+        .play-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: buttonShine 3s infinite;
+        }
+
+        @keyframes buttonShine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+
+        .coming-soon {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 20px;
+            font-style: italic;
+        }
+
+        .reset-button {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 10px 25px;
+            background: rgba(255, 0, 0, 0.3);
+            border: 2px solid #ff0000;
+            color: #ff5555;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .lock-icon {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">NEON DASH</h1>
+        <div class="subtitle">Level Selection</div>
+    </div>
+
+    <div class="levels-container">
+        <div class="section-title">Campaign Levels</div>
+
+        <!-- Level 1 -->
+        <div class="level-card" id="level1" onclick="playLevel(1)">
+            <div class="level-header">
+                <div class="level-number">01</div>
+                <div class="level-name">Neon Beginning</div>
+                <div class="level-status">
+                    <span class="status-badge" id="status1">Not Started</span>
+                </div>
+            </div>
+            <div class="level-info">
+                <div class="info-item">
+                    <span class="info-label">Difficulty:</span>
+                    <span>⯨☆☆☆☆</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Best Progress:</span>
+                    <span id="progress1">0%</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Attempts:</span>
+                    <span id="attempts1">0</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar1" style="width: 0%"></div>
+                <div class="progress-text" id="progressText1">0%</div>
+            </div>
+            <button class="play-button">▶ PLAY LEVEL</button>
+        </div>
+
+        <!-- Level 2 - Locked/Coming Soon -->
+        <div class="level-card" style="opacity: 0.5; cursor: not-allowed;" onclick="event.stopPropagation()">
+            <div class="level-header">
+                <div class="level-number">02</div>
+                <div class="level-name">Cyber Rush</div>
+                <div class="level-status">
+                    <span class="status-badge status-locked"><span class="lock-icon">🔒</span> Locked</span>
+                </div>
+            </div>
+            <div class="level-info">
+                <div class="info-item">
+                    <span class="info-label">Difficulty:</span>
+                    <span>★★★☆☆</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Unlock:</span>
+                    <span>Complete Level 1</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%"></div>
+                <div class="progress-text">Locked</div>
+            </div>
+        </div>
+
+        <!-- Level 3 - Locked/Coming Soon -->
+        <div class="level-card" style="opacity: 0.5; cursor: not-allowed;" onclick="event.stopPropagation()">
+            <div class="level-header">
+                <div class="level-number">03</div>
+                <div class="level-name">Platform Paradise</div>
+                <div class="level-status">
+                    <span class="status-badge status-locked"><span class="lock-icon">🔒</span> Locked</span>
+                </div>
+            </div>
+            <div class="level-info">
+                <div class="info-item">
+                    <span class="info-label">Difficulty:</span>
+                    <span>★★★★☆</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Unlock:</span>
+                    <span>Complete Level 2</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%"></div>
+                <div class="progress-text">Locked</div>
+            </div>
+        </div>
+
+        <div class="coming-soon">More levels coming soon...</div>
+
+        <button class="reset-button" onclick="resetProgress()" style="margin-top: 30px; width: 100%;">
+            Reset All Progress
+        </button>
+    </div>
+
+    <script>
+        // Load progress from localStorage
+        function loadProgress() {
+            const progress = JSON.parse(localStorage.getItem('neonDashProgress')) || {
+                level1: { bestProgress: 0, attempts: 0, completed: false }
+            };
+            
+            // Update Level 1 UI
+            document.getElementById('progress1').textContent = progress.level1.bestProgress + '%';
+            document.getElementById('attempts1').textContent = progress.level1.attempts;
+            document.getElementById('progressBar1').style.width = progress.level1.bestProgress + '%';
+            document.getElementById('progressText1').textContent = progress.level1.bestProgress + '%';
+            
+            const status1 = document.getElementById('status1');
+            if (progress.level1.completed) {
+                status1.textContent = 'Complete';
+                status1.className = 'status-badge status-complete';
+            } else if (progress.level1.bestProgress > 0) {
+                status1.textContent = progress.level1.bestProgress + '%';
+                status1.className = 'status-badge status-incomplete';
+            } else {
+                status1.textContent = 'Not Started';
+                status1.className = 'status-badge status-incomplete';
+            }
+        }
+
+        function playLevel(levelNum) {
+            if (levelNum === 1) {
+                // Increment attempts
+                const progress = JSON.parse(localStorage.getItem('neonDashProgress')) || {
+                    level1: { bestProgress: 0, attempts: 0, completed: false }
+                };
+                progress.level1.attempts++;
+                localStorage.setItem('neonDashProgress', JSON.stringify(progress));
+                
+                // Go to level 1
+                window.location.href = 'geometry-dash.html';
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('neonDashProgress');
+                loadProgress();
+                alert('Progress reset successfully!');
+            }
+        }
+
+        // Load progress on page load
+        loadProgress();
+    </script>
+</body>
+</html>
