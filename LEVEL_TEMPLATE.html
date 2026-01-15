@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level X - LEVEL NAME HERE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0015 0%, #1a0033 50%, #0f001f 100%);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 600px;
+            background: #000;
+            border: 3px solid #ff00ff;
+            box-shadow: 0 0 40px #ff00ff, inset 0 0 60px rgba(255, 0, 255, 0.1);
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #000814 0%, #001d3d 50%, #000814 100%);
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .score {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            font-weight: 900;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+            letter-spacing: 3px;
+        }
+
+        .game-over, .start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .game-over.hidden, .start-screen.hidden {
+            display: none;
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 72px;
+            font-weight: 900;
+            color: #ff00ff;
+            text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff, 0 0 90px #ff00ff;
+            margin-bottom: 20px;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff; }
+            50% { text-shadow: 0 0 40px #ff00ff, 0 0 80px #ff00ff, 0 0 120px #ff00ff; }
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            margin-bottom: 40px;
+        }
+
+        button {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 900;
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            border: none;
+            color: #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+
+        .instructions {
+            color: #aaa;
+            margin-top: 30px;
+            font-size: 18px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="ui-overlay">
+            <div class="score" id="score">0</div>
+        </div>
+
+        <div class="start-screen" id="startScreen">
+            <h1>LEVEL X</h1>
+            <div class="subtitle">YOUR LEVEL NAME</div>
+            <div style="margin: 20px 0; color: #00ffff; font-size: 20px;">Difficulty: ★★★☆☆</div>
+            <button id="startBtn">START LEVEL</button>
+            <div class="instructions">
+                Press SPACE or click to jump<br>
+                Navigate through a hand-crafted level<br>
+                One life - reach the green finish line!<br>
+                <br>
+                Press SPACE to restart after game over
+            </div>
+        </div>
+
+        <div class="game-over hidden" id="gameOver">
+            <h1>GAME OVER</h1>
+            <div class="final-score" id="finalScore">Score: 0</div>
+            <button id="restartBtn">PLAY AGAIN</button>
+            <button id="menuBtn" style="margin-top: 20px;">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Load the game engine -->
+    <script src="game-engine.js"></script>
+
+    <!-- YOUR LEVEL DATA GOES HERE! -->
+    <script>
+        // STEP 1: Define your level layout
+        // Available obstacle types:
+        // - { x: 800, type: 'spike' } - Single spike
+        // - { x: 1200, type: 'block', width: 100 } - Landable block
+        // - { x: 3500, type: 'platform', height: 120, width: 240 } - Floating platform
+        // - { x: 10000, type: 'finish' } - Finish line
+        
+        const levelXData = [
+            { x: 800, type: 'spike' },
+            { x: 1200, type: 'spike' },
+            { x: 1600, type: 'block', width: 100 },
+            
+            // Add more obstacles here!
+            // Remember: spikes are 40px wide, so place them 40px apart to make them touch
+            // Give yourself 300-400px between obstacles for the first few jumps
+            
+            { x: 5000, type: 'finish' } // Finish line (change x value to match your level length)
+        ];
+
+        // STEP 2: Set your level length (should be ~200px past your finish line)
+        const levelLength = 5200;
+
+        // STEP 3: Initialize the game
+        const game = new NeonDashGame(
+            'gameCanvas',
+            levelXData,
+            levelLength,
+            { number: 2, name: 'Your Level Name' } // Change the number and name!
+        );
+    </script>
+</body>
+</html>
