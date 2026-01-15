@@ -118,6 +118,13 @@ class NeonDashGame {
                     width: data.width || 200,
                     height: 25
                 });
+            } else if (data.type === 'small_platform') {
+                this.platforms.push({
+                    x: data.x,
+                    y: this.ground - data.height,
+                    width: data.width || 140, // Smaller default width
+                    height: 25
+                });
             } else if (data.type === 'finish') {
                 this.obstacles.push({
                     x: data.x,
@@ -222,8 +229,9 @@ class NeonDashGame {
         this.player.velocityY += this.player.gravity;
         this.player.y += this.player.velocityY;
         
-        // Ground and platform collision
+        // Ground collision
         let onPlatform = false;
+        let justLanded = false;
         
         // Check platform collisions
         this.platforms.forEach(platform => {
@@ -242,7 +250,7 @@ class NeonDashGame {
                 this.player.isJumping = false;
                 this.player.rotation = 0;
                 onPlatform = true;
-                this.spacePressed = false;
+                justLanded = true;
             }
             
             // Hitting from below
@@ -275,7 +283,7 @@ class NeonDashGame {
                     this.player.isJumping = false;
                     this.player.rotation = 0;
                     onPlatform = true;
-                    this.spacePressed = false;
+                    justLanded = true;
                 }
                 
                 // Hitting from below
@@ -298,9 +306,15 @@ class NeonDashGame {
             this.player.velocityY = 0;
             this.player.isJumping = false;
             this.player.rotation = 0;
-            this.spacePressed = false;
+            justLanded = true;
         } else if (!onPlatform && this.player.y < this.ground - this.player.height) {
             this.player.rotation += 5;
+        }
+        
+        // Instant bounce when holding space and landing
+        if (justLanded && this.spacePressed) {
+            this.player.velocityY = this.player.jumpForce;
+            this.player.isJumping = true;
         }
         
         // Check obstacle collisions
