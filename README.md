@@ -97,6 +97,15 @@ const game = new NeonDashGame(
 - Can land on top
 - Can't glitch through from below
 
+### Small Platform
+```javascript
+{ x: 4000, type: 'small_platform', height: 120, width: 140 }
+```
+- Width: Custom (default 140px - narrower than regular platform)
+- Height: Distance from ground
+- Perfect for tighter jumps
+- Same mechanics as regular platform
+
 ### Finish Line
 ```javascript
 { x: 10000, type: 'finish' }
