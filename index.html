@@ -401,14 +401,7 @@
 
         function playLevel(levelNum) {
             if (levelNum === 1) {
-                // Increment attempts
-                const progress = JSON.parse(localStorage.getItem('neonDashProgress')) || {
-                    level1: { bestProgress: 0, attempts: 0, completed: false }
-                };
-                progress.level1.attempts++;
-                localStorage.setItem('neonDashProgress', JSON.stringify(progress));
-                
-                // Go to level 1
+                // Go to level 1 (attempts will be counted on death/completion)
                 window.location.href = 'level1.html';
             }
         }
