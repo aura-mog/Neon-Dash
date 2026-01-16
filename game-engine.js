@@ -36,6 +36,11 @@ class NeonDashGame {
         this.levelComplete = false;
         this.spacePressed = false;
         
+        // Death effect
+        this.deathEffectActive = false;
+        this.deathEffectTimer = 0;
+        this.screenShake = 0;
+        
         // UI elements
         this.startScreen = document.getElementById('startScreen');
         this.gameOverScreen = document.getElementById('gameOver');
@@ -232,6 +237,7 @@ class NeonDashGame {
         // Ground collision
         let onPlatform = false;
         let justLanded = false;
+        let wasOnPlatform = !this.player.isJumping; // Track if player was on ground/platform last frame
         
         // Check platform collisions
         this.platforms.forEach(platform => {
@@ -309,6 +315,10 @@ class NeonDashGame {
             justLanded = true;
         } else if (!onPlatform && this.player.y < this.ground - this.player.height) {
             this.player.rotation += 5;
+            // If player was on platform/ground last frame but isn't now, they're falling
+            if (wasOnPlatform) {
+                this.player.isJumping = true;
+            }
         }
         
         // Instant bounce when holding space and landing
@@ -338,6 +348,7 @@ class NeonDashGame {
                     if (!savedProgress[levelKey]) savedProgress[levelKey] = { bestProgress: 0, attempts: 0, completed: false };
                     savedProgress[levelKey].bestProgress = 100;
                     savedProgress[levelKey].completed = true;
+                    savedProgress[levelKey].attempts++; // Count completion as an attempt
                     localStorage.setItem('neonDashProgress', JSON.stringify(savedProgress));
                     
                     this.finalScoreDisplay.textContent = 'LEVEL COMPLETE!';
@@ -382,11 +393,27 @@ class NeonDashGame {
                 
                 if (collided) {
                     this.gameRunning = false;
-                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, '#ff00ff', 25);
+                    this.deathEffectActive = true;
+                    this.deathEffectTimer = 30; // 30 frames of effect
+                    this.screenShake = 15;
+                    
+                    // Explosion effect - way more particles!
+                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, '#ff00ff', 40);
+                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, '#00ffff', 30);
+                    
+                    // Increment attempts on death
+                    const savedProgress = JSON.parse(localStorage.getItem('neonDashProgress')) || {};
+                    const levelKey = 'level' + this.levelInfo.number;
+                    if (!savedProgress[levelKey]) {
+                        savedProgress[levelKey] = { bestProgress: 0, attempts: 0, completed: false };
+                    }
+                    savedProgress[levelKey].attempts++;
+                    localStorage.setItem('neonDashProgress', JSON.stringify(savedProgress));
+                    
                     this.finalScoreDisplay.textContent = 'GAME OVER';
                     setTimeout(() => {
                         this.gameOverScreen.classList.remove('hidden');
-                    }, 300);
+                    }, 500); // Longer delay to see death effect
                 }
             }
         });
@@ -400,6 +427,16 @@ class NeonDashGame {
             
             if (this.particles[i].life <= 0) {
                 this.particles.splice(i, 1);
+            }
+        }
+        
+        // Update death effect
+        if (this.deathEffectActive) {
+            this.deathEffectTimer--;
+            this.screenShake *= 0.85; // Reduce shake over time
+            if (this.deathEffectTimer <= 0) {
+                this.deathEffectActive = false;
+                this.screenShake = 0;
             }
         }
         
@@ -420,6 +457,14 @@ class NeonDashGame {
     }
     
     draw() {
+        // Apply screen shake if active
+        if (this.deathEffectActive && this.screenShake > 0) {
+            this.ctx.save();
+            const shakeX = (Math.random() - 0.5) * this.screenShake;
+            const shakeY = (Math.random() - 0.5) * this.screenShake;
+            this.ctx.translate(shakeX, shakeY);
+        }
+        
         // Clear
         this.ctx.fillStyle = 'rgba(0, 8, 20, 0.3)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -570,6 +615,18 @@ class NeonDashGame {
         this.ctx.fillRect(-this.player.width / 2 + 5, -this.player.height / 2 + 5, this.player.width - 10, this.player.height - 10);
         
         this.ctx.restore();
+        
+        // Death flash effect
+        if (this.deathEffectActive && this.deathEffectTimer > 15) {
+            const flashAlpha = (this.deathEffectTimer - 15) / 15; // Fade from 1 to 0
+            this.ctx.fillStyle = `rgba(255, 0, 100, ${flashAlpha * 0.4})`;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        
+        // Restore screen shake transform if active
+        if (this.deathEffectActive && this.screenShake > 0) {
+            this.ctx.restore();
+        }
     }
     
     updateProgress() {
