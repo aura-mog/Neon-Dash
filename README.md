@@ -203,5 +203,9 @@ Want to add new mechanics? Edit `game-engine.js`:
 Add the mechanic once → works in ALL levels!
 
 ---
+### Play the Game
+Main: https://neon-dashgame.vercel.app/ 
+Backup: https://neon-dash-80k.pages.dev/
+
 
 Made with ❤️ for easy level creation!
