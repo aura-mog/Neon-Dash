@@ -231,7 +231,12 @@ class NeonDashGame {
         if (!this.gameRunning) return;
         
         // Update camera
-        this.cameraX += this.gameSpeed;
+        // Stop camera when finish line is at right edge (like real Geometry Dash)
+        const maxCameraX = this.levelLength - this.canvas.width;
+        if (this.cameraX < maxCameraX) {
+            this.cameraX += this.gameSpeed;
+        }
+        // Camera is now locked - finish line stays at edge of screen!
         
         // Update player
         this.player.velocityY += this.player.gravity;
