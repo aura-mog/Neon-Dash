@@ -768,7 +768,8 @@ class NeonDashGame {
     gameLoop() {
         this.update();
         this.draw();
-        if (this.gameRunning) {
+        // Only continue loop if game is running AND not paused
+        if (this.gameRunning && !this.gamePaused) {
             requestAnimationFrame(() => this.gameLoop());
         }
     }
