@@ -20,6 +20,7 @@ class NeonDashGame {
             velocityY: 0,
             gravity: 0.8,
             jumpForce: -12, // Reduced from -15 for lower jumps
+            jumpPadForce: -18, // Jump pad boost - 50% stronger!
             isJumping: false,
             rotation: 0
         };
@@ -123,19 +124,21 @@ class NeonDashGame {
                     width: data.width || 200,
                     height: 25
                 });
-            } else if (data.type === 'small_platform') {
-                this.platforms.push({
-                    x: data.x,
-                    y: this.ground - data.height,
-                    width: data.width || 140, // Smaller default width
-                    height: 25
-                });
-            } else if (data.type === 'finish') {
+            } else if (data.type === 'jumppad') {
                 this.obstacles.push({
                     x: data.x,
-                    y: this.ground - 150,
+                    y: this.ground - 15,
                     width: 60,
-                    height: 150,
+                    height: 15,
+                    type: 'jumppad'
+                });
+            } else if (data.type === 'finish') {
+                // Finish line is a big wall at the end
+                this.obstacles.push({
+                    x: data.x,
+                    y: 0, // Starts at top of screen
+                    width: 100,
+                    height: this.ground, // Full screen height
                     type: 'finish'
                 });
             }
@@ -332,6 +335,20 @@ class NeonDashGame {
             const screenX = obstacle.x - this.cameraX;
             
             if (obstacle.type === 'finish') {
+                // Magnetic pull effect when close to finish
+                const distanceToFinish = screenX - this.player.x;
+                if (distanceToFinish < 300 && distanceToFinish > 0) {
+                    // Pull player toward finish (stronger as you get closer)
+                    const pullStrength = (300 - distanceToFinish) / 300;
+                    this.player.x += pullStrength * 2;
+                    
+                    // Create portal particles
+                    if (Math.random() < 0.3) {
+                        this.createParticles(screenX + 50, Math.random() * this.ground, '#00ff00', 2);
+                    }
+                }
+                
+                // Check if player reached finish
                 if (
                     this.player.x + this.player.width > screenX &&
                     this.player.x < screenX + obstacle.width
@@ -339,8 +356,9 @@ class NeonDashGame {
                     this.levelComplete = true;
                     this.gameRunning = false;
                     this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, '#00ffff', 30);
+                    this.createParticles(screenX + 50, this.ground / 2, '#00ff00', 50);
                     
-                    // Save completion
+                    // Save completion and increment attempts
                     const savedProgress = JSON.parse(localStorage.getItem('neonDashProgress')) || {
                         level1: { bestProgress: 0, attempts: 0, completed: false }
                     };
@@ -359,7 +377,23 @@ class NeonDashGame {
             } else {
                 let collided = false;
                 
-                if (obstacle.type === 'spike') {
+                if (obstacle.type === 'jumppad') {
+                    // Jump pad - boost player when landing on it
+                    if (
+                        this.player.x + this.player.width > screenX &&
+                        this.player.x < screenX + obstacle.width &&
+                        this.player.y + this.player.height >= obstacle.y - 5 &&
+                        this.player.y + this.player.height <= obstacle.y + obstacle.height + 5 &&
+                        this.player.velocityY >= 0
+                    ) {
+                        // BOOST!
+                        this.player.velocityY = this.player.jumpPadForce;
+                        this.player.isJumping = true;
+                        // Create boost effect
+                        this.createParticles(this.player.x + this.player.width / 2, obstacle.y, '#ffff00', 15);
+                        onPlatform = true; // Prevent falling through
+                    }
+                } else if (obstacle.type === 'spike') {
                     // Tighter hitbox excluding glow
                     const spikeLeft = screenX + 5;
                     const spikeRight = screenX + obstacle.width - 5;
@@ -572,21 +606,63 @@ class NeonDashGame {
                     this.ctx.shadowBlur = 0;
                     this.ctx.fillStyle = '#000';
                     this.ctx.fillRect(screenX + 5, obstacle.y + 5, obstacle.width - 10, obstacle.height - 10);
-                } else if (obstacle.type === 'finish') {
-                    this.ctx.shadowBlur = 30;
-                    this.ctx.shadowColor = '#00ff00';
-                    this.ctx.fillStyle = '#00ff00';
+                } else if (obstacle.type === 'jumppad') {
+                    // Draw jump pad - yellow with arrows
+                    this.ctx.shadowBlur = 25;
+                    this.ctx.shadowColor = '#ffff00';
+                    this.ctx.fillStyle = '#ffff00';
                     this.ctx.fillRect(screenX, obstacle.y, obstacle.width, obstacle.height);
                     
+                    // Draw arrow pattern
                     this.ctx.shadowBlur = 0;
                     this.ctx.fillStyle = '#000';
-                    for (let y = 0; y < obstacle.height; y += 20) {
-                        for (let x = 0; x < obstacle.width; x += 20) {
-                            if ((x / 20 + y / 20) % 2 === 0) {
-                                this.ctx.fillRect(screenX + x, obstacle.y + y, 20, 20);
-                            }
-                        }
+                    const arrowSize = 8;
+                    for (let i = 0; i < 3; i++) {
+                        const arrowX = screenX + 10 + i * 20;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(arrowX, obstacle.y + 10);
+                        this.ctx.lineTo(arrowX - arrowSize, obstacle.y + 3);
+                        this.ctx.lineTo(arrowX + arrowSize, obstacle.y + 3);
+                        this.ctx.closePath();
+                        this.ctx.fill();
                     }
+                } else if (obstacle.type === 'finish') {
+                    // Draw finish portal - big glowing wall
+                    const time = Date.now() / 1000;
+                    
+                    // Outer glow
+                    this.ctx.shadowBlur = 50;
+                    this.ctx.shadowColor = '#00ff00';
+                    
+                    // Main portal wall - gradient
+                    const gradient = this.ctx.createLinearGradient(screenX, 0, screenX + obstacle.width, 0);
+                    gradient.addColorStop(0, 'rgba(0, 255, 0, 0.3)');
+                    gradient.addColorStop(0.5, 'rgba(0, 255, 100, 0.8)');
+                    gradient.addColorStop(1, 'rgba(0, 255, 0, 0.3)');
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.fillRect(screenX, obstacle.y, obstacle.width, obstacle.height);
+                    
+                    // Animated vertical lines (portal effect)
+                    this.ctx.shadowBlur = 0;
+                    this.ctx.strokeStyle = '#00ff00';
+                    this.ctx.lineWidth = 3;
+                    for (let i = 0; i < 5; i++) {
+                        const lineY = (time * 200 + i * 100) % obstacle.height;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(screenX, lineY);
+                        this.ctx.lineTo(screenX + obstacle.width, lineY);
+                        this.ctx.stroke();
+                    }
+                    
+                    // Center bright line
+                    this.ctx.strokeStyle = '#ffffff';
+                    this.ctx.lineWidth = 5;
+                    this.ctx.globalAlpha = 0.5 + Math.sin(time * 5) * 0.3;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(screenX + obstacle.width / 2, 0);
+                    this.ctx.lineTo(screenX + obstacle.width / 2, obstacle.height);
+                    this.ctx.stroke();
+                    this.ctx.globalAlpha = 1;
                 }
                 this.ctx.shadowBlur = 0;
             }
