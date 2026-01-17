@@ -36,6 +36,7 @@ class NeonDashGame {
         this.ground = 0;
         this.levelComplete = false;
         this.spacePressed = false;
+        this.gamePaused = false;
         
         // Death effect
         this.deathEffectActive = false;
@@ -168,6 +169,11 @@ class NeonDashGame {
                         this.spacePressed = true;
                     }
                 }
+            } else if (e.code === 'Escape' || e.code === 'KeyP') {
+                // Toggle pause
+                if (this.gameRunning && !this.levelComplete) {
+                    this.togglePause();
+                }
             }
         });
         
@@ -206,6 +212,14 @@ class NeonDashGame {
         this.gameLoop();
     }
     
+    togglePause() {
+        this.gamePaused = !this.gamePaused;
+        if (!this.gamePaused) {
+            // Resume game loop
+            this.gameLoop();
+        }
+    }
+    
     jump() {
         if (!this.player.isJumping && this.gameRunning && !this.levelComplete) {
             this.player.velocityY = this.player.jumpForce;
@@ -228,15 +242,17 @@ class NeonDashGame {
     }
     
     update() {
-        if (!this.gameRunning) return;
+        if (!this.gameRunning || this.gamePaused) return;
         
         // Update camera
         // Stop camera when finish line is at right edge (like real Geometry Dash)
         const maxCameraX = this.levelLength - this.canvas.width;
         if (this.cameraX < maxCameraX) {
             this.cameraX += this.gameSpeed;
+        } else {
+            // Camera is locked - move player forward instead!
+            this.player.x += this.gameSpeed;
         }
-        // Camera is now locked - finish line stays at edge of screen!
         
         // Update player
         this.player.velocityY += this.player.gravity;
@@ -707,6 +723,28 @@ class NeonDashGame {
         // Restore screen shake transform if active
         if (this.deathEffectActive && this.screenShake > 0) {
             this.ctx.restore();
+        }
+        
+        // Draw pause overlay
+        if (this.gamePaused && this.gameRunning) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            this.ctx.font = '72px Orbitron';
+            this.ctx.fillStyle = '#ff00ff';
+            this.ctx.shadowBlur = 30;
+            this.ctx.shadowColor = '#ff00ff';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 - 40);
+            
+            this.ctx.font = '24px Rajdhani';
+            this.ctx.fillStyle = '#00ffff';
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = '#00ffff';
+            this.ctx.fillText('Press ESC or P to Resume', this.canvas.width / 2, this.canvas.height / 2 + 40);
+            
+            this.ctx.shadowBlur = 0;
+            this.ctx.textAlign = 'left';
         }
     }
     
