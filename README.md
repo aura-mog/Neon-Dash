@@ -54,6 +54,18 @@ const level2Data = [
 const levelLength = 10200; // About 200px past your finish line
 ```
 
+**HOW TO CALCULATE:**
+1. Look at your last obstacle (finish line): `{ x: 10000, type: 'finish' }`
+2. Add 200-300 pixels: `10000 + 200 = 10200`
+3. That's your levelLength!
+
+**This makes the percentage counter work correctly:**
+- At pixel 5,100 → Shows 50%
+- At pixel 10,000 (finish) → Shows ~98%
+- At pixel 10,200 → Shows 100%
+
+**IMPORTANT:** Always update levelLength when you add more obstacles!
+
 **Step 5: Update game initialization**
 ```javascript
 const game = new NeonDashGame(
@@ -92,26 +104,29 @@ const game = new NeonDashGame(
 ```javascript
 { x: 3500, type: 'platform', height: 150, width: 240 }
 ```
-- Width: Custom (default 200px)
+- Width: Custom (default 200px) - **just set width to whatever you want!**
 - Height: Distance from ground
 - Can land on top
 - Can't glitch through from below
 
-### Small Platform
+### Jump Pad (NEW!)
 ```javascript
-{ x: 4000, type: 'small_platform', height: 120, width: 140 }
+{ x: 4000, type: 'jumppad' }
 ```
-- Width: Custom (default 140px - narrower than regular platform)
-- Height: Distance from ground
-- Perfect for tighter jumps
-- Same mechanics as regular platform
+- Width: 60px (fixed)
+- Height: 15px (fixed)
+- **Boosts player 50% higher than normal jump!**
+- Yellow with up arrows
+- Perfect for reaching high platforms
 
 ### Finish Line
 ```javascript
 { x: 10000, type: 'finish' }
 ```
 - Always at the end
-- Green checkered pattern
+- **Big glowing green portal wall** (fills screen height!)
+- **Pulls player toward it** when you get close (magnetic effect)
+- Animated portal effects
 - Completes the level
 
 ---
@@ -120,6 +135,7 @@ const game = new NeonDashGame(
 
 ### Player Stats:
 - **Jump Force**: -12 (reduced from -15 for shorter jumps)
+- **Jump Pad Force**: -18 (50% stronger boost!)
 - **Gravity**: 0.8
 - **Speed**: 7 pixels/frame
 - **Size**: 40x40 pixels
@@ -201,7 +217,6 @@ Want to add new mechanics? Edit `game-engine.js`:
 - Different player skins
 
 Add the mechanic once → works in ALL levels!
-
 ---
 ### Play the Game
 Main: https://neon-dashgame.vercel.app/ 
