@@ -194,7 +194,6 @@
     <script>
         // Define Level 1 layout
         const level1Data = [
-            // Section 1: Tutorial - Very easy, lots of space
             { x: 800, type: 'spike' },
             { x: 1200, type: 'spike' },
             { x: 1600, type: 'block', width: 100 },
@@ -265,16 +264,42 @@
             { x: 13700, type: 'spike' },
             { x: 14050, type: 'block', width: 140 },
             { x: 14450, type: 'spike' },
+
+            { x: 15000, type: 'block', size: 'small', width: 100 },
+            { x: 15150, type: 'block', size: 'medium', width: 100 },
+            { x: 15300, type: 'block', size: 'large', width: 100 },
+
+            { x: 15500, type: 'spike' },
+            { x: 15540, type: 'spike' },
             
+            { x: 15800, type: 'platform', height: 80, width: 260 },
+            { x: 15800, type: 'spike' },
+            { x: 15840, type: 'spike' },
+            { x: 15880, type: 'spike' },
+
+            { x: 16120, type: 'platform', height: 160, width: 60 },
+            { x: 16300, type: 'platform', height: 160, width: 60 },
+            { x: 16120, type: 'spike' },
+            { x: 16160, type: 'spike' },
+            { x: 16200, type: 'spike' },
+            { x: 16240, type: 'spike' },
+            { x: 16280, type: 'spike' },
+            { x: 16320, type: 'spike' },
+            { x: 16620, type: 'spike' },
+            { x: 16660, type: 'spike' },
+
+            { x: 16800, type: 'spike' },
+            { x: 16840, type: 'spike' },
+
             // Level end marker
-            { x: 14500, type: 'finish' }
+            { x: 17100, type: 'finish' }
         ];
 
         // Initialize the game with Level 1 data
         const game = new NeonDashGame(
             'gameCanvas',
             level1Data,
-            14500, // Level length - about 200px past last obstacle (17000)
+            17100, // Level length - about 200px past last obstacle (17000)
             { number: 1, name: 'Neon Beginning' }
         );
     </script>
