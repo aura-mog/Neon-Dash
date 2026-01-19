@@ -1,4 +1,3 @@
-
 // ==========================================
 // NEON DASH - GAME ENGINE
 // Reusable game mechanics for all levels
@@ -104,6 +103,28 @@ class NeonDashGame {
                     height: 45, // Reduced from 60
                     type: 'spike'
                 });
+            } else if (data.type === '2spike') {
+                // 2 spikes in a row - create individual spikes
+                for (let i = 0; i < 2; i++) {
+                    this.obstacles.push({
+                        x: data.x + (i * 40),
+                        y: this.ground - 45,
+                        width: 40,
+                        height: 45,
+                        type: 'spike'
+                    });
+                }
+            } else if (data.type === '6spike') {
+                // 6 spikes in a row - create individual spikes
+                for (let i = 0; i < 6; i++) {
+                    this.obstacles.push({
+                        x: data.x + (i * 40),
+                        y: this.ground - 45,
+                        width: 40,
+                        height: 45,
+                        type: 'spike'
+                    });
+                }
             } else if (data.type === 'block') {
                 const sizes = {
                     small: 40,
@@ -152,6 +173,18 @@ class NeonDashGame {
     resizeCanvas() {
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
+        
+        // Update ground position when canvas resizes
+        const oldGround = this.ground;
+        this.ground = this.canvas.height - 100;
+        
+        // Keep player on ground if game is running
+        if (this.player && oldGround > 0) {
+            const wasOnGround = Math.abs(this.player.y - (oldGround - this.player.height)) < 5;
+            if (wasOnGround) {
+                this.player.y = this.ground - this.player.height;
+            }
+        }
     }
     
     setupEventListeners() {
@@ -416,7 +449,7 @@ class NeonDashGame {
                         onPlatform = true; // Prevent falling through
                     }
                 } else if (obstacle.type === 'spike') {
-                    // Tighter hitbox excluding glow
+                    // Tighter hitbox excluding glow (works for all spike types)
                     const spikeLeft = screenX + 5;
                     const spikeRight = screenX + obstacle.width - 5;
                     const spikeTop = obstacle.y + 5;
