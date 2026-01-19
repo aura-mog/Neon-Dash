@@ -1,3 +1,4 @@
+
 // ==========================================
 // NEON DASH - GAME ENGINE
 // Reusable game mechanics for all levels
@@ -103,28 +104,6 @@ class NeonDashGame {
                     height: 45, // Reduced from 60
                     type: 'spike'
                 });
-            } else if (data.type === '2spike') {
-                // 2 spikes in a row - create individual spikes
-                for (let i = 0; i < 2; i++) {
-                    this.obstacles.push({
-                        x: data.x + (i * 40),
-                        y: this.ground - 45,
-                        width: 40,
-                        height: 45,
-                        type: 'spike'
-                    });
-                }
-            } else if (data.type === '5spike') {
-                // 5 spikes in a row - create individual spikes
-                for (let i = 0; i < 5; i++) {
-                    this.obstacles.push({
-                        x: data.x + (i * 40),
-                        y: this.ground - 45,
-                        width: 40,
-                        height: 45,
-                        type: 'spike'
-                    });
-                }
             } else if (data.type === 'block') {
                 const sizes = {
                     small: 40,
@@ -171,22 +150,8 @@ class NeonDashGame {
     }
     
     resizeCanvas() {
-        // Get the container size
-        const container = this.canvas.parentElement;
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        
-        // Set canvas to fill container
-        this.canvas.width = containerWidth;
-        this.canvas.height = containerHeight;
-        
-        // Update ground position based on new height
-        this.ground = this.canvas.height - 100;
-        
-        // Keep player on ground
-        if (this.player) {
-            this.player.y = this.ground - this.player.height;
-        }
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
     }
     
     setupEventListeners() {
@@ -450,8 +415,8 @@ class NeonDashGame {
                         this.createParticles(this.player.x + this.player.width / 2, obstacle.y, '#ffff00', 15);
                         onPlatform = true; // Prevent falling through
                     }
-                } else if (obstacle.type === 'spike' || obstacle.type === 'spike_2' || obstacle.type === 'spike_5') {
-                    // Tighter hitbox excluding glow (works for all spike types)
+                } else if (obstacle.type === 'spike') {
+                    // Tighter hitbox excluding glow
                     const spikeLeft = screenX + 5;
                     const spikeRight = screenX + obstacle.width - 5;
                     const spikeTop = obstacle.y + 5;
@@ -654,34 +619,6 @@ class NeonDashGame {
                     this.ctx.lineTo(screenX + obstacle.width, obstacle.y + obstacle.height);
                     this.ctx.closePath();
                     this.ctx.fill();
-                } else if (obstacle.type === 'spike_2') {
-                    // Draw 2 spikes in a row
-                    this.ctx.shadowBlur = 20;
-                    this.ctx.shadowColor = '#ff00ff';
-                    this.ctx.fillStyle = '#ff00ff';
-                    for (let i = 0; i < 2; i++) {
-                        const spikeX = screenX + (i * 40);
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(spikeX + 20, obstacle.y);
-                        this.ctx.lineTo(spikeX, obstacle.y + obstacle.height);
-                        this.ctx.lineTo(spikeX + 40, obstacle.y + obstacle.height);
-                        this.ctx.closePath();
-                        this.ctx.fill();
-                    }
-                } else if (obstacle.type === 'spike_5') {
-                    // Draw 5 spikes in a row
-                    this.ctx.shadowBlur = 20;
-                    this.ctx.shadowColor = '#ff00ff';
-                    this.ctx.fillStyle = '#ff00ff';
-                    for (let i = 0; i < 5; i++) {
-                        const spikeX = screenX + (i * 40);
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(spikeX + 20, obstacle.y);
-                        this.ctx.lineTo(spikeX, obstacle.y + obstacle.height);
-                        this.ctx.lineTo(spikeX + 40, obstacle.y + obstacle.height);
-                        this.ctx.closePath();
-                        this.ctx.fill();
-                    }
                 } else if (obstacle.type === 'block') {
                     this.ctx.shadowBlur = 20;
                     this.ctx.shadowColor = '#ff00ff';
