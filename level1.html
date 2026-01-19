@@ -17,20 +17,92 @@
             font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
             height: 100vh;
+            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
+            padding: 0;
         }
 
         .game-container {
             position: relative;
-            width: 100%;
+            width: 90vw;
             max-width: 1200px;
-            height: 600px;
+            height: 70vh;
+            max-height: 600px;
             background: #000;
             border: 3px solid #ff00ff;
             box-shadow: 0 0 40px #ff00ff, inset 0 0 60px rgba(255, 0, 255, 0.1);
             overflow: hidden;
+        }
+
+        /* Mobile phones */
+        @media (max-width: 768px) {
+            .game-container {
+                width: 95vw;
+                height: 50vh;
+                border-width: 2px;
+            }
+            
+            h1 {
+                font-size: 48px !important;
+            }
+            
+            .score {
+                font-size: 24px !important;
+            }
+        }
+
+        /* Tablets */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .game-container {
+                width: 90vw;
+                height: 65vh;
+            }
+        }
+
+        /* Large monitors */
+        @media (min-width: 1400px) {
+            .game-container {
+                width: 80vw;
+                max-width: 1600px;
+                height: 75vh;
+                max-height: 800px;
+            }
+        }
+
+        /* Ultra-wide monitors */
+        @media (min-width: 1920px) {
+            .game-container {
+                max-width: 1800px;
+                max-height: 900px;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .game-container {
+                width: 95vw;
+                height: calc(95vw * 0.5); /* Maintain 2:1 aspect ratio */
+                max-height: 80vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                width: 100vw;
+                height: calc(100vw * 0.6); /* Adjust aspect ratio for mobile */
+                max-height: 70vh;
+                border-width: 2px;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .game-container {
+                max-width: 1600px;
+                height: 800px;
+            }
         }
 
         #gameCanvas {
@@ -192,6 +264,7 @@
 
     <!-- Level 1 Data -->
     <script>
+
         // Define Level 1 layout
         const level1Data = [
             { x: 800, type: 'spike' },
