@@ -82,7 +82,7 @@ const game = new NeonDashGame(
 
 ## 📐 Obstacle Reference
 
-### Spike
+### Spike (Single)
 ```javascript
 { x: 800, type: 'spike' }
 ```
@@ -90,6 +90,26 @@ const game = new NeonDashGame(
 - Height: 45px (shorter than before!)
 - Deadly from all sides
 - Place 40px apart to make them touch (e.g., x: 800, x: 840)
+
+### 2-Spike Row
+```javascript
+{ x: 1200, type: '2spike' }
+```
+- Width: 80px (2 spikes × 40px)
+- Height: 45px
+- Two spikes in a row
+- Perfect for harder obstacles
+- No gaps between spikes
+
+### 5-Spike Row
+```javascript
+{ x: 2000, type: '5spike' }
+```
+- Width: 200px (5 spikes × 40px)
+- Height: 45px
+- Five spikes in a row
+- Great for spike walls or long obstacles
+- Forces player to jump over
 
 ### Block
 ```javascript
@@ -217,10 +237,7 @@ Want to add new mechanics? Edit `game-engine.js`:
 - Different player skins
 
 Add the mechanic once → works in ALL levels!
----
-### Play the Game
-Main: https://neon-dashgame.vercel.app/ 
-Backup: https://neon-dash-80k.pages.dev/
 
+---
 
 Made with ❤️ for easy level creation!
