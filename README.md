@@ -101,13 +101,13 @@ const game = new NeonDashGame(
 - Perfect for harder obstacles
 - No gaps between spikes
 
-### 5-Spike Row
+### 6-Spike Row
 ```javascript
-{ x: 2000, type: '5spike' }
+{ x: 2000, type: '6spike' }
 ```
-- Width: 200px (5 spikes × 40px)
+- Width: 240px 65 spikes × 40px)
 - Height: 45px
-- Five spikes in a row
+- Six spikes in a row
 - Great for spike walls or long obstacles
 - Forces player to jump over
 
