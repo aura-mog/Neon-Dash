@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 2 - Spike Gauntlet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a0000 0%, #330000 50%, #1a0000 100%);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .game-container {
+            position: relative;
+            width: 90vw;
+            max-width: 1200px;
+            height: 70vh;
+            max-height: 600px;
+            background: #000;
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 40px #ff0000, inset 0 0 60px rgba(255, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Mobile phones */
+        @media (max-width: 768px) {
+            .game-container {
+                width: 95vw;
+                height: 50vh;
+                border-width: 2px;
+            }
+            
+            h1 {
+                font-size: 48px !important;
+            }
+            
+            .score {
+                font-size: 24px !important;
+            }
+        }
+
+        /* Tablets */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .game-container {
+                width: 90vw;
+                height: 65vh;
+            }
+        }
+
+        /* Large monitors */
+        @media (min-width: 1400px) {
+            .game-container {
+                width: 80vw;
+                max-width: 1600px;
+                height: 75vh;
+                max-height: 800px;
+            }
+        }
+
+        /* Ultra-wide monitors */
+        @media (min-width: 1920px) {
+            .game-container {
+                max-width: 1800px;
+                max-height: 900px;
+            }
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #140000 0%, #2d0000 50%, #140000 100%);
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .score {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            font-weight: 900;
+            color: #ff6600;
+            text-shadow: 0 0 20px #ff6600, 0 0 40px #ff6600;
+            letter-spacing: 3px;
+        }
+
+        .game-over, .start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+        }
+
+        .game-over.hidden, .start-screen.hidden {
+            display: none;
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 72px;
+            font-weight: 900;
+            color: #ff0000;
+            text-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000, 0 0 90px #ff0000;
+            margin-bottom: 20px;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000; }
+            50% { text-shadow: 0 0 40px #ff0000, 0 0 80px #ff0000, 0 0 120px #ff0000; }
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #ff6666;
+            text-shadow: 0 0 10px #ff6666;
+            margin-bottom: 40px;
+        }
+
+        button {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 900;
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #ff0000 0%, #ff6600 100%);
+            border: none;
+            color: #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .instructions {
+            color: #aaa;
+            margin-top: 30px;
+            font-size: 18px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #ff6600;
+            text-shadow: 0 0 20px #ff6600;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="ui-overlay">
+            <div class="score" id="score">0</div>
+        </div>
+
+        <div class="start-screen" id="startScreen">
+            <h1>LEVEL 2</h1>
+            <div class="subtitle">Spike Gauntlet</div>
+            <button id="startBtn">START</button>
+            <div class="instructions">
+                Press SPACE or click to jump<br>
+                Use jump pads for extra height!<br>
+                Watch out for spike walls!<br>
+                <br>
+                Press ESC or P to pause
+            </div>
+        </div>
+
+        <div class="game-over hidden" id="gameOver">
+            <h1>GAME OVER</h1>
+            <div class="final-score" id="finalScore">Score: 0</div>
+            <button id="restartBtn">TRY AGAIN</button>
+            <button id="menuBtn" style="margin-top: 20px;">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Load the game engine -->
+    <script src="game-engine.js"></script>
+
+    <!-- Level 2 Data -->
+    <script>
+        const level2Data = [
+            // Section 1: Introduction to double spikes
+            { x: 800, type: 'spike' },
+            { x: 1200, type: '2spike' },
+            { x: 1700, type: 'spike' },
+            { x: 2100, type: '2spike' },
+            
+            // Section 2: First jump pad experience
+            { x: 2600, type: 'jumppad' },
+            { x: 2900, type: 'spike' },
+            { x: 3300, type: 'block', width: 120 },
+            
+            // Section 3: Spike wall introduction!
+            { x: 3800, type: 'spike' },
+            { x: 4200, type: '6spike' },
+            { x: 4700, type: 'platform', height: 120, width: 240 },
+            
+            // Section 4: Jump pad + platform combo
+            { x: 5200, type: '2spike' },
+            { x: 5700, type: 'jumppad' },
+            { x: 6000, type: 'platform', height: 150, width: 200 },
+            { x: 6400, type: 'spike' },
+            
+            // Section 5: Double spike gauntlet
+            { x: 6900, type: '2spike' },
+            { x: 7300, type: '2spike' },
+            { x: 7700, type: '2spike' },
+            { x: 8100, type: 'block', width: 140 },
+            
+            // Section 6: Spike wall maze
+            { x: 8600, type: '6spike' },
+            { x: 9000, type: 'platform', height: 110, width: 220 },
+            { x: 9400, type: '6spike' },
+            { x: 9800, type: 'jumppad' },
+            
+            // Section 7: Mixed difficulty
+            { x: 10300, type: 'spike' },
+            { x: 10700, type: '2spike' },
+            { x: 11100, type: '6spike' },
+            { x: 11600, type: 'platform', height: 120, width: 240 },
+            
+            // Section 8: Jump pad staircase
+            { x: 12100, type: 'jumppad' },
+            { x: 12400, type: 'block', width: 100 },
+            { x: 12800, type: 'jumppad' },
+            { x: 13100, type: 'block', width: 100 },
+            { x: 13500, type: '2spike' },
+            
+            // Section 9: Spike wall valley
+            { x: 14000, type: '6spike' },
+            { x: 14400, type: '6spike' },
+            { x: 14800, type: '6spike' },
+            { x: 15200, type: 'platform', height: 130, width: 260 },
+            
+            // Section 10: Final gauntlet
+            { x: 15700, type: 'jumppad' },
+            { x: 16000, type: '2spike' },
+            { x: 16400, type: 'spike' },
+            { x: 16800, type: '6spike' },
+            { x: 17200, type: 'jumppad' },
+            { x: 17500, type: 'platform', height: 140, width: 280 },
+            
+            // Section 11: Extended challenge - spike wall city
+            { x: 17900, type: '2spike' },
+            { x: 18300, type: '6spike' },
+            { x: 18700, type: 'jumppad' },
+            { x: 19000, type: 'platform', height: 150, width: 220 },
+            { x: 19400, type: '6spike' },
+            { x: 19800, type: '2spike' },
+            
+            // Section 12: Platform parkour
+            { x: 20200, type: 'jumppad' },
+            { x: 20500, type: 'platform', height: 140, width: 180 },
+            { x: 20900, type: 'platform', height: 160, width: 180 },
+            { x: 21300, type: '6spike' },
+            { x: 21700, type: 'spike' },
+            
+            // Section 13: Speed section
+            { x: 22100, type: '2spike' },
+            { x: 22400, type: '2spike' },
+            { x: 22700, type: '2spike' },
+            { x: 23000, type: 'jumppad' },
+            { x: 23300, type: 'block', width: 140 },
+            
+            // Section 14: Final spike wall barrage
+            { x: 23700, type: '6spike' },
+            { x: 24100, type: 'platform', height: 130, width: 240 },
+            { x: 24500, type: '6spike' },
+            { x: 24900, type: 'jumppad' },
+            
+            // Victory straight
+            { x: 25300, type: 'spike' },
+            
+            // Finish line
+            { x: 25600, type: 'finish' }
+        ];
+
+        // Initialize the game with Level 2 data
+        const game = new NeonDashGame(
+            'gameCanvas',
+            level2Data,
+            27000,  // Extended level!
+            { number: 2, name: 'Spike Gauntlet' }
+        );
+    </script>
+</body>
+</html>
