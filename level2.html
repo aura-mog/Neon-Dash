@@ -17,67 +17,20 @@
             font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
             height: 100vh;
-            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
-            padding: 0;
         }
 
         .game-container {
             position: relative;
-            width: 90vw;
+            width: 100%;
             max-width: 1200px;
-            height: 70vh;
-            max-height: 600px;
+            height: 600px;
             background: #000;
             border: 3px solid #ff0000;
             box-shadow: 0 0 40px #ff0000, inset 0 0 60px rgba(255, 0, 0, 0.1);
             overflow: hidden;
-        }
-
-        /* Mobile phones */
-        @media (max-width: 768px) {
-            .game-container {
-                width: 95vw;
-                height: 50vh;
-                border-width: 2px;
-            }
-            
-            h1 {
-                font-size: 48px !important;
-            }
-            
-            .score {
-                font-size: 24px !important;
-            }
-        }
-
-        /* Tablets */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .game-container {
-                width: 90vw;
-                height: 65vh;
-            }
-        }
-
-        /* Large monitors */
-        @media (min-width: 1400px) {
-            .game-container {
-                width: 80vw;
-                max-width: 1600px;
-                height: 75vh;
-                max-height: 800px;
-            }
-        }
-
-        /* Ultra-wide monitors */
-        @media (min-width: 1920px) {
-            .game-container {
-                max-width: 1800px;
-                max-height: 900px;
-            }
         }
 
         #gameCanvas {
@@ -170,8 +123,21 @@
             transform: scale(1.05);
         }
 
-        button:active {
-            transform: scale(0.95);
+        button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
         }
 
         .instructions {
@@ -201,20 +167,22 @@
         <div class="start-screen" id="startScreen">
             <h1>LEVEL 2</h1>
             <div class="subtitle">Spike Gauntlet</div>
-            <button id="startBtn">START</button>
+            <div style="margin: 20px 0; color: #ff6666; font-size: 20px;">Difficulty: ★★★☆☆</div>
+            <button id="startBtn">START LEVEL</button>
             <div class="instructions">
                 Press SPACE or click to jump<br>
                 Use jump pads for extra height!<br>
                 Watch out for spike walls!<br>
                 <br>
-                Press ESC or P to pause
+                Press ESC or P to PAUSE<br>
+                Press SPACE to restart after game over
             </div>
         </div>
 
         <div class="game-over hidden" id="gameOver">
             <h1>GAME OVER</h1>
-            <div class="final-score" id="finalScore">Score: 0</div>
-            <button id="restartBtn">TRY AGAIN</button>
+            <div class="final-score" id="finalScore">Score: 0%</div>
+            <button id="restartBtn">PLAY AGAIN</button>
             <button id="menuBtn" style="margin-top: 20px;">BACK TO MENU</button>
         </div>
     </div>
