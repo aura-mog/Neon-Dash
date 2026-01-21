@@ -11,6 +11,9 @@ class NeonDashGame {
         this.levelLength = levelLength;
         this.levelInfo = levelInfo; // { number: 1, name: "Neon Beginning" }
         
+        // Set theme colors based on level
+        this.setThemeColors();
+        
         // Game state
         this.player = {
             x: 180,
@@ -53,6 +56,28 @@ class NeonDashGame {
         this.setupEventListeners();
     }
     
+    setThemeColors() {
+        // Use custom theme if provided, otherwise use defaults
+        if (this.levelInfo.theme) {
+            this.colors = {
+                primary: this.levelInfo.theme.primary,
+                secondary: this.levelInfo.theme.secondary,
+                accent: this.levelInfo.theme.accent || this.levelInfo.theme.primary,
+                player: this.levelInfo.theme.secondary,
+                platform: this.levelInfo.theme.secondary
+            };
+        } else {
+            // Default - Purple/Cyan theme
+            this.colors = {
+                primary: '#ff00ff',      // Magenta
+                secondary: '#00ffff',    // Cyan
+                accent: '#ffffff',       // White
+                player: '#00ffff',       // Cyan player
+                platform: '#00ffff'      // Cyan platforms
+            };
+        }
+    }
+    
     init() {
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
@@ -91,6 +116,21 @@ class NeonDashGame {
                 type: Math.random() > 0.5 ? 'triangle' : 'square',
                 opacity: Math.random() * 0.3 + 0.1
             });
+        }
+        
+        // Create embers for level 2 (rising fire particles)
+        this.embers = [];
+        if (this.levelInfo.number === 2) {
+            for (let i = 0; i < 40; i++) {
+                this.embers.push({
+                    x: Math.random() * this.levelLength,
+                    y: this.ground + Math.random() * 50,
+                    size: 2 + Math.random() * 3,
+                    speed: 0.3 + Math.random() * 1.2,
+                    brightness: 0.3 + Math.random() * 0.7,
+                    life: Math.random()
+                });
+            }
         }
         
         // Create obstacles from level data
@@ -410,7 +450,7 @@ class NeonDashGame {
                 ) {
                     this.levelComplete = true;
                     this.gameRunning = false;
-                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, '#00ffff', 30);
+                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, this.colors.secondary, 30);
                     this.createParticles(screenX + 50, this.ground / 2, '#00ff00', 50);
                     
                     // Save completion and increment attempts
@@ -490,8 +530,8 @@ class NeonDashGame {
                     this.screenShake = 15;
                     
                     // Explosion effect - way more particles!
-                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, '#ff00ff', 40);
-                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, '#00ffff', 30);
+                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, this.colors.primary, 40);
+                    this.createParticles(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, this.colors.secondary, 30);
                     
                     // Increment attempts on death
                     const savedProgress = JSON.parse(localStorage.getItem('neonDashProgress')) || {};
@@ -549,6 +589,21 @@ class NeonDashGame {
             shape.rotation += shape.rotationSpeed;
         });
         
+        // Update embers (level 2 only)
+        if (this.embers) {
+            this.embers.forEach(ember => {
+                ember.y -= ember.speed;
+                ember.life -= 0.005;
+                
+                // Reset ember when it goes off screen or dies
+                if (ember.y < 0 || ember.life <= 0) {
+                    ember.y = this.ground + Math.random() * 50;
+                    ember.x = this.cameraX - 100 + Math.random() * (this.canvas.width + 200);
+                    ember.life = Math.random();
+                }
+            });
+        }
+        
         this.updateProgress();
     }
     
@@ -569,10 +624,30 @@ class NeonDashGame {
         this.stars.forEach(star => {
             const screenX = star.x - this.cameraX;
             if (screenX > -10 && screenX < this.canvas.width + 10) {
-                this.ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                // Parse theme color
+                const color = this.colors.accent;
+                const r = parseInt(color.slice(1, 3), 16);
+                const g = parseInt(color.slice(3, 5), 16);
+                const b = parseInt(color.slice(5, 7), 16);
+                this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${star.brightness})`;
                 this.ctx.fillRect(screenX, star.y, star.size, star.size);
             }
         });
+        
+        // Draw embers (level 2 only)
+        if (this.embers) {
+            this.embers.forEach(ember => {
+                const screenX = ember.x - this.cameraX;
+                if (screenX > -10 && screenX < this.canvas.width + 10) {
+                    const opacity = ember.brightness * ember.life;
+                    this.ctx.shadowBlur = 8;
+                    this.ctx.shadowColor = `rgba(255, 100, 0, ${opacity})`;
+                    this.ctx.fillStyle = `rgba(255, ${50 + ember.brightness * 150}, 0, ${opacity})`;
+                    this.ctx.fillRect(screenX, ember.y, ember.size, ember.size);
+                    this.ctx.shadowBlur = 0;
+                }
+            });
+        }
         
         // Draw floating shapes
         this.floatingShapes.forEach(shape => {
@@ -584,7 +659,7 @@ class NeonDashGame {
                 this.ctx.globalAlpha = shape.opacity;
                 
                 if (shape.type === 'triangle') {
-                    this.ctx.strokeStyle = '#ff00ff';
+                    this.ctx.strokeStyle = this.colors.primary;
                     this.ctx.lineWidth = 2;
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, -shape.size / 2);
@@ -593,7 +668,7 @@ class NeonDashGame {
                     this.ctx.closePath();
                     this.ctx.stroke();
                 } else {
-                    this.ctx.strokeStyle = '#00ffff';
+                    this.ctx.strokeStyle = this.colors.secondary;
                     this.ctx.lineWidth = 2;
                     this.ctx.strokeRect(-shape.size / 2, -shape.size / 2, shape.size, shape.size);
                 }
@@ -614,14 +689,14 @@ class NeonDashGame {
         }
         
         // Draw ground
-        this.ctx.fillStyle = '#ff00ff';
+        this.ctx.fillStyle = this.colors.primary;
         this.ctx.shadowBlur = 20;
-        this.ctx.shadowColor = '#ff00ff';
+        this.ctx.shadowColor = this.colors.primary;
         this.ctx.fillRect(0, this.ground, this.canvas.width, 5);
         this.ctx.shadowBlur = 0;
         
         const lineOffset = this.cameraX % 40;
-        this.ctx.strokeStyle = '#00ffff';
+        this.ctx.strokeStyle = this.colors.secondary;
         this.ctx.lineWidth = 2;
         for (let i = 0; i < this.canvas.width; i += 40) {
             this.ctx.beginPath();
@@ -635,8 +710,8 @@ class NeonDashGame {
             const screenX = platform.x - this.cameraX;
             if (screenX > -platform.width && screenX < this.canvas.width) {
                 this.ctx.shadowBlur = 15;
-                this.ctx.shadowColor = '#00ffff';
-                this.ctx.fillStyle = '#00ffff';
+                this.ctx.shadowColor = this.colors.platform;
+                this.ctx.fillStyle = this.colors.platform;
                 this.ctx.fillRect(screenX, platform.y, platform.width, platform.height);
                 
                 this.ctx.shadowBlur = 0;
@@ -651,8 +726,8 @@ class NeonDashGame {
             if (screenX > -obstacle.width && screenX < this.canvas.width) {
                 if (obstacle.type === 'spike') {
                     this.ctx.shadowBlur = 20;
-                    this.ctx.shadowColor = '#ff00ff';
-                    this.ctx.fillStyle = '#ff00ff';
+                    this.ctx.shadowColor = this.colors.primary;
+                    this.ctx.fillStyle = this.colors.primary;
                     this.ctx.beginPath();
                     this.ctx.moveTo(screenX + obstacle.width / 2, obstacle.y);
                     this.ctx.lineTo(screenX, obstacle.y + obstacle.height);
@@ -661,8 +736,8 @@ class NeonDashGame {
                     this.ctx.fill();
                 } else if (obstacle.type === 'block') {
                     this.ctx.shadowBlur = 20;
-                    this.ctx.shadowColor = '#ff00ff';
-                    this.ctx.fillStyle = '#ff00ff';
+                    this.ctx.shadowColor = this.colors.primary;
+                    this.ctx.fillStyle = this.colors.primary;
                     this.ctx.fillRect(screenX, obstacle.y, obstacle.width, obstacle.height);
                     
                     this.ctx.shadowBlur = 0;
@@ -744,8 +819,8 @@ class NeonDashGame {
         this.ctx.rotate((this.player.rotation * Math.PI) / 180);
         
         this.ctx.shadowBlur = 30;
-        this.ctx.shadowColor = '#00ffff';
-        this.ctx.fillStyle = '#00ffff';
+        this.ctx.shadowColor = this.colors.player;
+        this.ctx.fillStyle = this.colors.player;
         this.ctx.fillRect(-this.player.width / 2, -this.player.height / 2, this.player.width, this.player.height);
         
         this.ctx.shadowBlur = 0;
@@ -772,9 +847,9 @@ class NeonDashGame {
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             
             this.ctx.font = '72px Orbitron';
-            this.ctx.fillStyle = '#ff00ff';
+            this.ctx.fillStyle = this.colors.primary;
             this.ctx.shadowBlur = 30;
-            this.ctx.shadowColor = '#ff00ff';
+            this.ctx.shadowColor = this.colors.primary;
             this.ctx.textAlign = 'center';
             this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 - 40);
             
