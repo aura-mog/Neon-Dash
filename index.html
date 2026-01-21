@@ -316,13 +316,13 @@
             <button class="play-button">▶ PLAY LEVEL</button>
         </div>
 
-        <!-- Level 2 - Locked/Coming Soon -->
-        <div class="level-card" style="opacity: 0.5; cursor: not-allowed;" onclick="event.stopPropagation()">
+        <!-- Level 2 -->
+        <div class="level-card" id="level2">
             <div class="level-header">
                 <div class="level-number">02</div>
-                <div class="level-name">Cyber Rush</div>
+                <div class="level-name">Spike Gauntlet</div>
                 <div class="level-status">
-                    <span class="status-badge status-locked"><span class="lock-icon">🔒</span> Locked</span>
+                    <span class="status-badge" id="status2">Not Started</span>
                 </div>
             </div>
             <div class="level-info">
@@ -330,15 +330,24 @@
                     <span class="info-label">Difficulty:</span>
                     <span>★★★☆☆</span>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="level2-unlock" style="display: none;">
                     <span class="info-label">Unlock:</span>
                     <span>Complete Level 1</span>
                 </div>
+                <div class="info-item" id="level2-progress" style="display: flex;">
+                    <span class="info-label">Best Progress:</span>
+                    <span id="progress2">0%</span>
+                </div>
+                <div class="info-item" id="level2-attempts" style="display: flex;">
+                    <span class="info-label">Attempts:</span>
+                    <span id="attempts2">0</span>
+                </div>
             </div>
             <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%"></div>
-                <div class="progress-text">Locked</div>
+                <div class="progress-fill" id="progressBar2" style="width: 0%"></div>
+                <div class="progress-text" id="progressText2">0%</div>
             </div>
+            <button class="play-button" id="level2-button">▶ PLAY LEVEL</button>
         </div>
 
         <!-- Level 3 - Locked/Coming Soon -->
@@ -377,7 +386,8 @@
         // Load progress from localStorage
         function loadProgress() {
             const progress = JSON.parse(localStorage.getItem('neonDashProgress')) || {
-                level1: { bestProgress: 0, attempts: 0, completed: false }
+                level1: { bestProgress: 0, attempts: 0, completed: false },
+                level2: { bestProgress: 0, attempts: 0, completed: false }
             };
             
             // Update Level 1 UI
@@ -397,12 +407,67 @@
                 status1.textContent = 'Not Started';
                 status1.className = 'status-badge status-incomplete';
             }
+            
+            // Update Level 2 UI based on Level 1 completion
+            const level2Card = document.getElementById('level2');
+            const level2Unlock = document.getElementById('level2-unlock');
+            const level2Progress = document.getElementById('level2-progress');
+            const level2Attempts = document.getElementById('level2-attempts');
+            const level2Button = document.getElementById('level2-button');
+            
+            if (progress.level1.completed) {
+                // Level 2 is unlocked!
+                level2Card.style.opacity = '1';
+                level2Card.style.cursor = 'pointer';
+                level2Card.onclick = function() { playLevel(2); };
+                level2Unlock.style.display = 'none';
+                level2Progress.style.display = 'flex';
+                level2Attempts.style.display = 'flex';
+                level2Button.style.display = 'block';
+                
+                document.getElementById('progress2').textContent = progress.level2.bestProgress + '%';
+                document.getElementById('attempts2').textContent = progress.level2.attempts;
+                document.getElementById('progressBar2').style.width = progress.level2.bestProgress + '%';
+                document.getElementById('progressText2').textContent = progress.level2.bestProgress + '%';
+                
+                const status2 = document.getElementById('status2');
+                if (progress.level2.completed) {
+                    status2.textContent = 'Complete';
+                    status2.className = 'status-badge status-complete';
+                } else if (progress.level2.bestProgress > 0) {
+                    status2.textContent = progress.level2.bestProgress + '%';
+                    status2.className = 'status-badge status-incomplete';
+                } else {
+                    status2.textContent = 'Not Started';
+                    status2.className = 'status-badge status-incomplete';
+                }
+            } else {
+                // Level 2 is locked
+                level2Card.style.opacity = '0.5';
+                level2Card.style.cursor = 'not-allowed';
+                level2Card.onclick = function(e) { 
+                    e.stopPropagation();
+                    alert('Complete Level 1 to unlock Level 2!');
+                };
+                level2Unlock.style.display = 'flex';
+                level2Progress.style.display = 'none';
+                level2Attempts.style.display = 'none';
+                level2Button.style.display = 'none';
+                
+                const status2 = document.getElementById('status2');
+                status2.innerHTML = '<span class="lock-icon">🔒</span> Locked';
+                status2.className = 'status-badge status-locked';
+                
+                document.getElementById('progressBar2').style.width = '0%';
+                document.getElementById('progressText2').textContent = 'Locked';
+            }
         }
 
         function playLevel(levelNum) {
             if (levelNum === 1) {
-                // Go to level 1 (attempts will be counted on death/completion)
                 window.location.href = 'level1.html';
+            } else if (levelNum === 2) {
+                window.location.href = 'level2.html';
             }
         }
 
