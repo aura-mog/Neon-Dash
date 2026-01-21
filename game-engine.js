@@ -424,7 +424,10 @@ class NeonDashGame {
                     savedProgress[levelKey].attempts++; // Count completion as an attempt
                     localStorage.setItem('neonDashProgress', JSON.stringify(savedProgress));
                     
-                    this.finalScoreDisplay.textContent = 'LEVEL COMPLETE!';
+                    // Change game over screen to show level complete
+                    const gameOverTitle = this.gameOverScreen.querySelector('h1');
+                    if (gameOverTitle) gameOverTitle.textContent = 'LEVEL COMPLETE';
+                    this.finalScoreDisplay.textContent = 'Score: 100%';
                     setTimeout(() => {
                         this.gameOverScreen.classList.remove('hidden');
                     }, 500);
@@ -499,7 +502,11 @@ class NeonDashGame {
                     savedProgress[levelKey].attempts++;
                     localStorage.setItem('neonDashProgress', JSON.stringify(savedProgress));
                     
-                    this.finalScoreDisplay.textContent = 'GAME OVER';
+                    // Reset game over screen to show game over
+                    const gameOverTitle = this.gameOverScreen.querySelector('h1');
+                    if (gameOverTitle) gameOverTitle.textContent = 'GAME OVER';
+                    const progress = Math.min(100, Math.floor((this.cameraX / this.levelLength) * 100));
+                    this.finalScoreDisplay.textContent = 'Score: ' + progress + '%';
                     setTimeout(() => {
                         this.gameOverScreen.classList.remove('hidden');
                     }, 500); // Longer delay to see death effect
