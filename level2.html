@@ -196,18 +196,31 @@
             // Section 1: Introduction to double spikes
             { x: 800, type: 'spike' },
             { x: 1200, type: '2spike' },
-            { x: 1700, type: 'spike' },
-            { x: 2100, type: '2spike' },
+            { x: 1500, type: '2spike' },
+            { x: 1800, type: '2spike' },
             
             // Section 2: First jump pad experience
-            { x: 2600, type: 'jumppad' },
-            { x: 2900, type: 'spike' },
-            { x: 3300, type: 'block', width: 120 },
+            { x: 1993, type: 'jumppad' },
+            { x: 2050, type: '6spike' },
+            { x: 2220, type: 'platform', height: 80, width: 80 },
+            { x: 2290, type: '6spike' },
+            { x: 2370, type: 'platform', height: 160, width: 60 },
+            { x: 2540, type: 'platform', height: 160, width: 60 },
+            { x: 2530, type: '6spike' },
+            
+            { x: 3000, type: '2spike' },
+            { x: 3300, type: '2spike' },
+            { x: 3600, type: 'jumppad' },
+            { x: 3650, type: '2spike' },
+            { x: 3730, type: '2spike' },
+
+            { x: 4000, type: 'spike' },
             
             // Section 3: Spike wall introduction!
-            { x: 3800, type: 'spike' },
-            { x: 4200, type: '6spike' },
-            { x: 4700, type: 'platform', height: 120, width: 240 },
+            { x: 4200, type: 'block', width: 100 },
+            { x: 4300, type: '6spike' },
+            { x: 4540, type: '2spike' },
+            { x: 4400, type: 'platform', height: 80, width: 240 },
             
             // Section 4: Jump pad + platform combo
             { x: 5200, type: '2spike' },
@@ -293,7 +306,7 @@
         const game = new NeonDashGame(
             'gameCanvas',
             level2Data,
-            25600,  // Extended level!
+            25600,  
             { 
                 number: 2, 
                 name: 'Spike Gauntlet',
