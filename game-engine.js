@@ -171,11 +171,14 @@ class NeonDashGame {
                     medium: 60,
                     large: 80
                 };
-                const height = sizes[data.size] || 50;
+                // Allow custom height or use size preset
+                const height = data.height || sizes[data.size] || 50;
                 const width = data.width || 40;
+                // Allow custom y position, otherwise calculate from ground
+                const yPos = data.y !== undefined ? data.y : (this.ground - height);
                 this.obstacles.push({
                     x: data.x,
-                    y: this.ground - height,
+                    y: yPos,
                     width: width,
                     height: height,
                     type: 'block'
@@ -188,10 +191,13 @@ class NeonDashGame {
                     height: 25
                 });
             } else if (data.type === 'jumppad') {
+                // Allow custom height - if height is specified, place it at that height above ground
+                // If no height, default to ground level
+                const yPos = data.y !== undefined ? data.y : (this.ground - 15);
                 this.obstacles.push({
                     x: data.x,
-                    y: this.ground - 15,
-                    width: 60,
+                    y: yPos,
+                    width: data.width || 60,
                     height: 15,
                     type: 'jumppad'
                 });
@@ -744,25 +750,31 @@ class NeonDashGame {
                     this.ctx.fillStyle = '#000';
                     this.ctx.fillRect(screenX + 5, obstacle.y + 5, obstacle.width - 10, obstacle.height - 10);
                 } else if (obstacle.type === 'jumppad') {
-                    // Draw jump pad - yellow with arrows
-                    this.ctx.shadowBlur = 25;
-                    this.ctx.shadowColor = '#ffff00';
-                    this.ctx.fillStyle = '#ffff00';
-                    this.ctx.fillRect(screenX, obstacle.y, obstacle.width, obstacle.height);
+                    // Draw jump pad - fully glowing yellow circle
+                    const centerX = screenX + obstacle.width / 2;
+                    const centerY = obstacle.y + obstacle.height / 2;
+                    const radius = Math.min(obstacle.width, obstacle.height) / 2;
                     
-                    // Draw arrow pattern
+                    // Outer glow
+                    this.ctx.shadowBlur = 40;
+                    this.ctx.shadowColor = '#ffff00';
+                    
+                    // Draw full yellow circle
+                    this.ctx.fillStyle = '#ffff00';
+                    this.ctx.beginPath();
+                    this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Pulse effect - bright center
+                    this.ctx.shadowBlur = 20;
+                    const pulseSize = radius * 0.5 + Math.sin(Date.now() / 200) * 3;
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.globalAlpha = 0.7;
+                    this.ctx.beginPath();
+                    this.ctx.arc(centerX, centerY, pulseSize, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.globalAlpha = 1;
                     this.ctx.shadowBlur = 0;
-                    this.ctx.fillStyle = '#000';
-                    const arrowSize = 8;
-                    for (let i = 0; i < 3; i++) {
-                        const arrowX = screenX + 10 + i * 20;
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(arrowX, obstacle.y + 10);
-                        this.ctx.lineTo(arrowX - arrowSize, obstacle.y + 3);
-                        this.ctx.lineTo(arrowX + arrowSize, obstacle.y + 3);
-                        this.ctx.closePath();
-                        this.ctx.fill();
-                    }
                 } else if (obstacle.type === 'finish') {
                     // Draw finish portal - big glowing wall
                     const time = Date.now() / 1000;
