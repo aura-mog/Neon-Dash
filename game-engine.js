@@ -205,7 +205,7 @@ class NeonDashGame {
                 this.obstacles.push({
                     x: data.x,
                     y: this.ground - yHeight,
-                    width: data.width || 60,
+                    width: data.width || 35,  // Default 35px wide
                     height: 15,
                     type: 'jumppad'
                 });
@@ -758,28 +758,31 @@ class NeonDashGame {
                     this.ctx.fillStyle = '#000';
                     this.ctx.fillRect(screenX + 5, obstacle.y + 5, obstacle.width - 10, obstacle.height - 10);
                 } else if (obstacle.type === 'jumppad') {
-                    // Draw jump pad - fully glowing yellow circle
+                    // Draw jump pad - rectangular base with semicircle arc on top
                     const centerX = screenX + obstacle.width / 2;
-                    const centerY = obstacle.y + obstacle.height / 2;
-                    const radius = Math.min(obstacle.width, obstacle.height) / 2;
+                    const baseY = obstacle.y + obstacle.height;
+                    const arcRadius = obstacle.width / 2;
                     
                     // Outer glow
                     this.ctx.shadowBlur = 40;
                     this.ctx.shadowColor = '#ffff00';
                     
-                    // Draw full yellow circle
+                    // Draw rectangular base
                     this.ctx.fillStyle = '#ffff00';
+                    this.ctx.fillRect(screenX, obstacle.y + obstacle.height / 2, obstacle.width, obstacle.height / 2);
+                    
+                    // Draw semicircle arc on top
                     this.ctx.beginPath();
-                    this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    this.ctx.arc(centerX, baseY - obstacle.height / 2, arcRadius, Math.PI, 0, false);
                     this.ctx.fill();
                     
                     // Pulse effect - bright center
                     this.ctx.shadowBlur = 20;
-                    const pulseSize = radius * 0.5 + Math.sin(Date.now() / 200) * 3;
+                    const pulseSize = arcRadius * 0.4 + Math.sin(Date.now() / 200) * 2;
                     this.ctx.fillStyle = '#ffffff';
                     this.ctx.globalAlpha = 0.7;
                     this.ctx.beginPath();
-                    this.ctx.arc(centerX, centerY, pulseSize, 0, Math.PI * 2);
+                    this.ctx.arc(centerX, baseY - obstacle.height / 2, pulseSize, 0, Math.PI * 2);
                     this.ctx.fill();
                     this.ctx.globalAlpha = 1;
                     this.ctx.shadowBlur = 0;
