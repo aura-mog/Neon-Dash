@@ -506,12 +506,17 @@ class NeonDashGame {
                         onPlatform = true; // Prevent falling through
                     }
                 } else if (obstacle.type === 'spike') {
-                    // Precise hitbox - matches the visual exactly
+                    // Small 2px buffer for fairness
+                    const spikeLeft = screenX + 2;
+                    const spikeRight = screenX + obstacle.width - 2;
+                    const spikeTop = obstacle.y + 2;
+                    const spikeBottom = obstacle.y + obstacle.height - 2;
+                    
                     if (
-                        this.player.x < screenX + obstacle.width &&
-                        this.player.x + this.player.width > screenX &&
-                        this.player.y < obstacle.y + obstacle.height &&
-                        this.player.y + this.player.height > obstacle.y
+                        this.player.x + 2 < spikeRight &&
+                        this.player.x + this.player.width - 2 > spikeLeft &&
+                        this.player.y + 2 < spikeBottom &&
+                        this.player.y + this.player.height - 2 > spikeTop
                     ) {
                         collided = true;
                     }
