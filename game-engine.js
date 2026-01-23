@@ -136,19 +136,22 @@ class NeonDashGame {
         // Create obstacles from level data
         this.levelData.forEach(data => {
             if (data.type === 'spike') {
+                // Allow custom y position (measured from ground up)
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 45);
                 this.obstacles.push({
                     x: data.x,
-                    y: this.ground - 45, // Reduced from 60 - shorter spikes!
+                    y: yPos,
                     width: 40,
-                    height: 45, // Reduced from 60
+                    height: 45,
                     type: 'spike'
                 });
             } else if (data.type === '2spike') {
                 // 2 spikes in a row - create individual spikes
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 45);
                 for (let i = 0; i < 2; i++) {
                     this.obstacles.push({
                         x: data.x + (i * 40),
-                        y: this.ground - 45,
+                        y: yPos,
                         width: 40,
                         height: 45,
                         type: 'spike'
@@ -156,10 +159,11 @@ class NeonDashGame {
                 }
             } else if (data.type === '6spike') {
                 // 6 spikes in a row - create individual spikes
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 45);
                 for (let i = 0; i < 6; i++) {
                     this.obstacles.push({
                         x: data.x + (i * 40),
-                        y: this.ground - 45,
+                        y: yPos,
                         width: 40,
                         height: 45,
                         type: 'spike'
@@ -174,8 +178,9 @@ class NeonDashGame {
                 // Allow custom height or use size preset
                 const height = data.height || sizes[data.size] || 50;
                 const width = data.width || 40;
-                // Allow custom y position, otherwise calculate from ground
-                const yPos = data.y !== undefined ? data.y : (this.ground - height);
+                // Y position measured from ground up (higher y = closer to ground)
+                // If no y specified, place on ground
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - height);
                 this.obstacles.push({
                     x: data.x,
                     y: yPos,
@@ -184,19 +189,22 @@ class NeonDashGame {
                     type: 'block'
                 });
             } else if (data.type === 'platform') {
+                // Y position measured from ground up (higher y = higher above ground)
+                // data.height is kept for backward compatibility (how high above ground)
+                const yHeight = data.y !== undefined ? data.y : data.height;
                 this.platforms.push({
                     x: data.x,
-                    y: this.ground - data.height,
+                    y: this.ground - yHeight,
                     width: data.width || 200,
                     height: 25
                 });
             } else if (data.type === 'jumppad') {
-                // Allow custom height - if height is specified, place it at that height above ground
-                // If no height, default to ground level
-                const yPos = data.y !== undefined ? data.y : (this.ground - 15);
+                // Y position measured from ground up (higher y = higher above ground)
+                // Default to ground level if no y specified
+                const yHeight = data.y !== undefined ? data.y : 15;
                 this.obstacles.push({
                     x: data.x,
-                    y: yPos,
+                    y: this.ground - yHeight,
                     width: data.width || 60,
                     height: 15,
                     type: 'jumppad'
@@ -498,17 +506,12 @@ class NeonDashGame {
                         onPlatform = true; // Prevent falling through
                     }
                 } else if (obstacle.type === 'spike') {
-                    // Tighter hitbox excluding glow (works for all spike types)
-                    const spikeLeft = screenX + 5;
-                    const spikeRight = screenX + obstacle.width - 5;
-                    const spikeTop = obstacle.y + 5;
-                    const spikeBottom = obstacle.y + obstacle.height;
-                    
+                    // Precise hitbox - matches the visual exactly
                     if (
-                        this.player.x + 5 < spikeRight &&
-                        this.player.x + this.player.width - 5 > spikeLeft &&
-                        this.player.y + 5 < spikeBottom &&
-                        this.player.y + this.player.height - 5 > spikeTop
+                        this.player.x < screenX + obstacle.width &&
+                        this.player.x + this.player.width > screenX &&
+                        this.player.y < obstacle.y + obstacle.height &&
+                        this.player.y + this.player.height > obstacle.y
                     ) {
                         collided = true;
                     }
