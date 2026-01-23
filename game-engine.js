@@ -201,12 +201,12 @@ class NeonDashGame {
             } else if (data.type === 'jumppad') {
                 // Y position measured from ground up (higher y = higher above ground)
                 // Default to ground level if no y specified
-                const yHeight = data.y !== undefined ? data.y : 15;
+                const yHeight = data.y !== undefined ? data.y : 6;
                 this.obstacles.push({
                     x: data.x,
                     y: this.ground - yHeight,
-                    width: data.width || 35,  // Default 35px wide
-                    height: 15,
+                    width: data.width || 40,  // Default 40px wide
+                    height: 6,  // 6px tall - almost flat
                     type: 'jumppad'
                 });
             } else if (data.type === 'finish') {
@@ -758,31 +758,32 @@ class NeonDashGame {
                     this.ctx.fillStyle = '#000';
                     this.ctx.fillRect(screenX + 5, obstacle.y + 5, obstacle.width - 10, obstacle.height - 10);
                 } else if (obstacle.type === 'jumppad') {
-                    // Draw jump pad - rectangular base with semicircle arc on top
+                    // Draw jump pad - almost flat with very subtle arc
                     const centerX = screenX + obstacle.width / 2;
                     const baseY = obstacle.y + obstacle.height;
-                    const arcRadius = obstacle.width / 2;
+                    const arcRadius = obstacle.width / 3;  // Wider radius for flatter arc
+                    const arcHeight = obstacle.height * 0.2;  // Arc is only 20% of height - very subtle
                     
                     // Outer glow
                     this.ctx.shadowBlur = 40;
                     this.ctx.shadowColor = '#ffff00';
                     
-                    // Draw rectangular base
+                    // Draw rectangular base (most of the pad)
                     this.ctx.fillStyle = '#ffff00';
-                    this.ctx.fillRect(screenX, obstacle.y + obstacle.height / 2, obstacle.width, obstacle.height / 2);
+                    this.ctx.fillRect(screenX, obstacle.y + arcHeight, obstacle.width, obstacle.height - arcHeight);
                     
-                    // Draw semicircle arc on top
+                    // Draw very subtle arc on top using ellipse
                     this.ctx.beginPath();
-                    this.ctx.arc(centerX, baseY - obstacle.height / 2, arcRadius, Math.PI, 0, false);
+                    this.ctx.ellipse(centerX, obstacle.y + arcHeight, arcRadius, arcHeight * 0.8, 0, Math.PI, 0, false);
                     this.ctx.fill();
                     
-                    // Pulse effect - bright center
-                    this.ctx.shadowBlur = 20;
-                    const pulseSize = arcRadius * 0.4 + Math.sin(Date.now() / 200) * 2;
+                    // Pulse effect - bright center (smaller for flat pad)
+                    this.ctx.shadowBlur = 15;
+                    const pulseSize = 2 + Math.sin(Date.now() / 200) * 1;
                     this.ctx.fillStyle = '#ffffff';
                     this.ctx.globalAlpha = 0.7;
                     this.ctx.beginPath();
-                    this.ctx.arc(centerX, baseY - obstacle.height / 2, pulseSize, 0, Math.PI * 2);
+                    this.ctx.arc(centerX, obstacle.y + obstacle.height / 2, pulseSize, 0, Math.PI * 2);
                     this.ctx.fill();
                     this.ctx.globalAlpha = 1;
                     this.ctx.shadowBlur = 0;
