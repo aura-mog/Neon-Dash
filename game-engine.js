@@ -22,7 +22,7 @@ class NeonDashGame {
             height: 40,  // Bigger cube!
             velocityY: 0,
             gravity: 0.8,
-            jumpForce: -12, // Reduced from -15 for lower jumps
+            jumpForce: -11, // Reduced from -15 for lower jumps
             jumpPadForce: -18, // Jump pad boost - 50% stronger!
             isJumping: false,
             rotation: 0
