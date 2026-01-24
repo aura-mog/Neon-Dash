@@ -86,17 +86,18 @@ const game = new NeonDashGame(
 ```javascript
 { x: 800, type: 'spike' }
 ```
-- Width: 40px
-- Height: 45px (shorter than before!)
+- Width: 30px
+- Height: 30px (square spike!)
+- Triangular hitbox (like Geometry Dash!)
 - Deadly from all sides
-- Place 40px apart to make them touch (e.g., x: 800, x: 840)
+- Place 30px apart to make them touch (e.g., x: 800, x: 830)
 
 ### 2-Spike Row
 ```javascript
 { x: 1200, type: '2spike' }
 ```
-- Width: 80px (2 spikes × 40px)
-- Height: 45px
+- Width: 60px (2 spikes × 30px)
+- Height: 30px
 - Two spikes in a row
 - Perfect for harder obstacles
 - No gaps between spikes
@@ -105,8 +106,8 @@ const game = new NeonDashGame(
 ```javascript
 { x: 2000, type: '6spike' }
 ```
-- Width: 240px 65 spikes × 40px)
-- Height: 45px
+- Width: 180px (6 spikes × 30px)
+- Height: 30px
 - Six spikes in a row
 - Great for spike walls or long obstacles
 - Forces player to jump over
