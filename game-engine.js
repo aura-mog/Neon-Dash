@@ -18,8 +18,8 @@ class NeonDashGame {
         this.player = {
             x: 180,
             y: 0,
-            width: 40,
-            height: 40,
+            width: 45,   // Bigger cube!
+            height: 45,  // Bigger cube!
             velocityY: 0,
             gravity: 0.8,
             jumpForce: -12, // Reduced from -15 for lower jumps
@@ -137,35 +137,35 @@ class NeonDashGame {
         this.levelData.forEach(data => {
             if (data.type === 'spike') {
                 // Allow custom y position (measured from ground up)
-                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 45);
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 30);
                 this.obstacles.push({
                     x: data.x,
                     y: yPos,
-                    width: 40,
-                    height: 45,
+                    width: 30,   // 30px wide
+                    height: 30,  // 30px tall
                     type: 'spike'
                 });
             } else if (data.type === '2spike') {
                 // 2 spikes in a row - create individual spikes
-                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 45);
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 30);
                 for (let i = 0; i < 2; i++) {
                     this.obstacles.push({
-                        x: data.x + (i * 40),
+                        x: data.x + (i * 30),
                         y: yPos,
-                        width: 40,
-                        height: 45,
+                        width: 30,
+                        height: 30,
                         type: 'spike'
                     });
                 }
             } else if (data.type === '6spike') {
                 // 6 spikes in a row - create individual spikes
-                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 45);
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 30);
                 for (let i = 0; i < 6; i++) {
                     this.obstacles.push({
-                        x: data.x + (i * 40),
+                        x: data.x + (i * 30),
                         y: yPos,
-                        width: 40,
-                        height: 45,
+                        width: 30,
+                        height: 30,
                         type: 'spike'
                     });
                 }
@@ -506,17 +506,38 @@ class NeonDashGame {
                         onPlatform = true; // Prevent falling through
                     }
                 } else if (obstacle.type === 'spike') {
-                    // Small 2px buffer for fairness
-                    const spikeLeft = screenX + 2;
-                    const spikeRight = screenX + obstacle.width - 2;
-                    const spikeTop = obstacle.y + 2;
-                    const spikeBottom = obstacle.y + obstacle.height - 2;
+                    // Triangular hitbox like Geometry Dash!
+                    // Triangle points: top center, bottom-left, bottom-right
+                    const spikeTopX = screenX + obstacle.width / 2;
+                    const spikeTopY = obstacle.y;
+                    const spikeBottomLeftX = screenX;
+                    const spikeBottomLeftY = obstacle.y + obstacle.height;
+                    const spikeBottomRightX = screenX + obstacle.width;
+                    const spikeBottomRightY = obstacle.y + obstacle.height;
                     
+                    // Helper function: check if point is inside triangle
+                    const pointInTriangle = (px, py, x1, y1, x2, y2, x3, y3) => {
+                        const area = 0.5 * (-y2 * x3 + y1 * (-x2 + x3) + x1 * (y2 - y3) + x2 * y3);
+                        const s = 1 / (2 * area) * (y1 * x3 - x1 * y3 + (y3 - y1) * px + (x1 - x3) * py);
+                        const t = 1 / (2 * area) * (x1 * y2 - y1 * x2 + (y1 - y2) * px + (x2 - x1) * py);
+                        return s > 0 && t > 0 && (1 - s - t) > 0;
+                    };
+                    
+                    // Check player's 4 corners and center point against triangle
+                    const playerLeft = this.player.x;
+                    const playerRight = this.player.x + this.player.width;
+                    const playerTop = this.player.y;
+                    const playerBottom = this.player.y + this.player.height;
+                    const playerCenterX = this.player.x + this.player.width / 2;
+                    const playerCenterY = this.player.y + this.player.height / 2;
+                    
+                    // Check if any corner or center is inside the triangle
                     if (
-                        this.player.x + 2 < spikeRight &&
-                        this.player.x + this.player.width - 2 > spikeLeft &&
-                        this.player.y + 2 < spikeBottom &&
-                        this.player.y + this.player.height - 2 > spikeTop
+                        pointInTriangle(playerLeft, playerTop, spikeTopX, spikeTopY, spikeBottomLeftX, spikeBottomLeftY, spikeBottomRightX, spikeBottomRightY) ||
+                        pointInTriangle(playerRight, playerTop, spikeTopX, spikeTopY, spikeBottomLeftX, spikeBottomLeftY, spikeBottomRightX, spikeBottomRightY) ||
+                        pointInTriangle(playerLeft, playerBottom, spikeTopX, spikeTopY, spikeBottomLeftX, spikeBottomLeftY, spikeBottomRightX, spikeBottomRightY) ||
+                        pointInTriangle(playerRight, playerBottom, spikeTopX, spikeTopY, spikeBottomLeftX, spikeBottomLeftY, spikeBottomRightX, spikeBottomRightY) ||
+                        pointInTriangle(playerCenterX, playerCenterY, spikeTopX, spikeTopY, spikeBottomLeftX, spikeBottomLeftY, spikeBottomRightX, spikeBottomRightY)
                     ) {
                         collided = true;
                     }
