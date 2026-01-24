@@ -18,8 +18,8 @@ class NeonDashGame {
         this.player = {
             x: 180,
             y: 0,
-            width: 45,   // Bigger cube!
-            height: 45,  // Bigger cube!
+            width: 40,   // Bigger cube!
+            height: 40,  // Bigger cube!
             velocityY: 0,
             gravity: 0.8,
             jumpForce: -12, // Reduced from -15 for lower jumps
