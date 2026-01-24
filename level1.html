@@ -196,120 +196,97 @@
         // Define Level 1 layout
         const level1Data = [
             { x: 800, type: 'spike' },
-            { x: 1200, type: '2spike' },
-            { x: 1500, type: '2spike' },
-            { x: 1800, type: '2spike' },
+            { x: 1200, type: 'spike' },
+            { x: 1600, type: 'block', width: 100 },
             
-            // Section 2: First jump pad experience
-            { x: 1993, type: 'jumppad' },
-            { x: 2050, type: '6spike' },
-            { x: 2220, type: 'platform', height: 80, width: 80 },
-            { x: 2260, type: '6spike' },
-            { x: 2370, type: 'platform', height: 160, width: 60 },
-            { x: 2540, type: 'platform', height: 160, width: 60 },
-            { x: 2470, type: '6spike' },
+            // Section 2: Learning rhythm
+            { x: 2100, type: 'spike' },
+            { x: 2500, type: 'spike' },
+            { x: 2900, type: 'block', width: 100 },
             
-            { x: 3000, type: '2spike' },
-            { x: 3300, type: '2spike' },
-            { x: 3600, type: 'jumppad' },
-            { x: 3650, type: '2spike' },
-            { x: 3720, type: '2spike' },
-            { x: 4000, type: 'spike' },
+            // Section 3: First platform challenge - FIXED to be reachable
+            { x: 3300, type: 'spike' },
+            { x: 3340, type: 'spike' },
+            { x: 3700, type: 'platform', height: 80, width: 240 },
+            { x: 3700, type: '6spike' },
+            { x: 4150, type: 'spike' },
+            
+            // Section 4: Block stepping stones
+            { x: 4500, type: 'spike' },
+            { x: 4900, type: 'block', width: 120 },
+            { x: 5300, type: 'spike' },
+            { x: 5700, type: 'block', width: 120 },
+            
+            // Section 5: Platform gauntlet
+            { x: 6100, type: 'spike' },
+            { x: 6140, type: 'spike' },
+            { x: 6500, type: 'spike' },
+            { x: 6500, type: 'platform', height: 80, width: 240 },
+            { x: 6500, type: '6spike' },
+            { x: 6850, type: 'spike' },
+            { x: 6890, type: 'spike' },
+            
+            // Section 6: Staircase - blocks spread out more for easier jumps
+            { x: 7300, type: 'block', size: 'small', width: 100 },
+            { x: 7550, type: 'block', size: 'medium', width: 120 },
+            { x: 7820, type: 'block', size: 'large', width: 140 },
+            { x: 8250, type: 'spike' },
+            
+            // Section 7: Speed section
+            { x: 8700, type: 'spike' },
+            { x: 8740, type: 'spike' },
+            { x: 9100, type: 'spike' },
+            { x: 9500, type: 'block', width: 120 },
+            
+            // Section 8: Platform section
+            { x: 9900, type: 'spike' },
+            { x: 9940, type: 'spike' },
+            { x: 10300, type: 'platform', height: 80, width: 240 },
+            { x: 10300, type: '6spike' },
+            { x: 10650, type: 'spike' },
+            { x: 10950, type: 'spike' },
+            
+            // Section 9: Block challenge
+            { x: 11350, type: 'spike' },
+            { x: 11750, type: 'block', width: 140 },
+            { x: 12150, type: 'spike' },
+            { x: 12190, type: 'spike' },
+            { x: 12550, type: 'block', width: 140 },
+            
+            // Section 10: Final stretch
+            { x: 12950, type: 'spike' },
+            { x: 12990, type: 'spike' },
+            { x: 13350, type: 'platform', height: 80, width: 240 },
+            { x: 13350, type: '6spike' },
+            { x: 13700, type: 'spike' },
+            { x: 14050, type: 'block', width: 140 },
+            { x: 14450, type: 'spike' },
 
-            // Section 3: Spike wall introduction!
-            { x: 4200, type: 'block', width: 100 },
-            { x: 4300, type: '6spike' },
-            { x: 4510, type: '2spike' },
-            { x: 4400, type: 'platform', height: 80, width: 240 },
-            
+            { x: 15000, type: 'block', size: 'small', width: 100 },
+            { x: 15150, type: 'block', size: 'medium', width: 100 },
+            { x: 15300, type: 'block', size: 'large', width: 100 },
 
-            // Section 4: Jump pad + platform combo
-            { x: 5200, type: '2spike' },
-            { x: 5315, type: 'jumppad' },
-            { x: 5500, type: 'block', width: 250, height: 150 },
-            { x: 5850, type: 'block', width: 60, height: 40, y: 200 },
-            { x: 5750, type: '6spike' },
-            { x: 5960, type: '6spike' },
-            { x: 6170, type: '6spike' },
-            { x: 6380, type: '2spike' },
-            { x: 6100, type: 'platform', height: 150, width: 200 },
-            { x: 6100, type: 'jumppad', y: 155 },
-            { x: 6145, type: '2spike', y: 185 },
-            { x: 6215, type: '2spike', y: 185 },
-            { x: 6430, type: 'platform', height: 80, width: 60 },
+            { x: 15500, type: 'spike' },
+            { x: 15540, type: 'spike' },
+            
+            { x: 15800, type: 'platform', height: 80, width: 240 },
+            { x: 15800, type: '6spike' },
 
-            // Section 5: Double spike gauntlet
-            { x: 6900, type: '2spike' },
-            { x: 7300, type: '2spike' },
-            { x: 7700, type: '2spike' },
-            { x: 8100, type: 'block', width: 140 },
-            
-            // Section 6: Spike wall maze
-            { x: 8600, type: '6spike' },
-            { x: 9000, type: 'platform', height: 110, width: 220 },
-            { x: 9400, type: '6spike' },
-            { x: 9800, type: 'jumppad' },
-            
-            // Section 7: Mixed difficulty
-            { x: 10300, type: 'spike' },
-            { x: 10700, type: '2spike' },
-            { x: 11100, type: '6spike' },
-            { x: 11600, type: 'platform', height: 120, width: 240 },
-            
-            // Section 8: Jump pad staircase
-            { x: 12100, type: 'jumppad' },
-            { x: 12400, type: 'block', width: 100 },
-            { x: 12800, type: 'jumppad' },
-            { x: 13100, type: 'block', width: 100 },
-            { x: 13500, type: '2spike' },
-            
-            // Section 9: Spike wall valley
-            { x: 14000, type: '6spike' },
-            { x: 14400, type: '6spike' },
-            { x: 14800, type: '6spike' },
-            { x: 15200, type: 'platform', height: 130, width: 260 },
-            
-            // Section 10: Final gauntlet
-            { x: 15700, type: 'jumppad' },
-            { x: 16000, type: '2spike' },
-            { x: 16400, type: 'spike' },
-            { x: 16800, type: '6spike' },
-            { x: 17200, type: 'jumppad' },
-            { x: 17500, type: 'platform', height: 140, width: 280 },
-            
-            // Section 11: Extended challenge - spike wall city
-            { x: 17900, type: '2spike' },
-            { x: 18300, type: '6spike' },
-            { x: 18700, type: 'jumppad' },
-            { x: 19000, type: 'platform', height: 150, width: 220 },
-            { x: 19400, type: '6spike' },
-            { x: 19800, type: '2spike' },
-            
-            // Section 12: Platform parkour
-            { x: 20200, type: 'jumppad' },
-            { x: 20500, type: 'platform', height: 140, width: 180 },
-            { x: 20900, type: 'platform', height: 160, width: 180 },
-            { x: 21300, type: '6spike' },
-            { x: 21700, type: 'spike' },
-            
-            // Section 13: Speed section
-            { x: 22100, type: '2spike' },
-            { x: 22400, type: '2spike' },
-            { x: 22700, type: '2spike' },
-            { x: 23000, type: 'jumppad' },
-            { x: 23300, type: 'block', width: 140 },
-            
-            // Section 14: Final spike wall barrage
-            { x: 23700, type: '6spike' },
-            { x: 24100, type: 'platform', height: 130, width: 240 },
-            { x: 24500, type: '6spike' },
-            { x: 24900, type: 'jumppad' },
-            
-            // Victory straight
-            { x: 25300, type: 'spike' },
-            
-            // Finish line
-            { x: 25600, type: 'finish' }
+            { x: 16120, type: 'platform', height: 160, width: 60 },
+            { x: 16300, type: 'platform', height: 160, width: 60 },
+            { x: 16120, type: 'spike' },
+            { x: 16160, type: 'spike' },
+            { x: 16200, type: 'spike' },
+            { x: 16240, type: 'spike' },
+            { x: 16280, type: 'spike' },
+            { x: 16320, type: 'spike' },
+            { x: 16620, type: 'spike' },
+            { x: 16660, type: 'spike' },
+
+            { x: 16820, type: 'spike' },
+            { x: 16860, type: 'spike' },
+            // Level end marker
+            { x: 17100, type: 'finish' }
         ];
 
         // Initialize the game with Level 1 data
