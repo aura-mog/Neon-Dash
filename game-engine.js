@@ -137,35 +137,47 @@ class NeonDashGame {
         this.levelData.forEach(data => {
             if (data.type === 'spike') {
                 // Allow custom y position (measured from ground up)
-                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 30);
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 35);
                 this.obstacles.push({
                     x: data.x,
                     y: yPos,
-                    width: 30,   // 30px wide
-                    height: 30,  // 30px tall
+                    width: 35,   // 35px wide
+                    height: 35,  // 35px tall
                     type: 'spike'
                 });
             } else if (data.type === '2spike') {
                 // 2 spikes in a row - create individual spikes
-                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 30);
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 35);
                 for (let i = 0; i < 2; i++) {
                     this.obstacles.push({
-                        x: data.x + (i * 30),
+                        x: data.x + (i * 35),
                         y: yPos,
-                        width: 30,
-                        height: 30,
+                        width: 35,
+                        height: 35,
                         type: 'spike'
                     });
                 }
             } else if (data.type === '6spike') {
                 // 6 spikes in a row - create individual spikes
-                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 30);
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 35);
                 for (let i = 0; i < 6; i++) {
                     this.obstacles.push({
-                        x: data.x + (i * 30),
+                        x: data.x + (i * 35),
                         y: yPos,
-                        width: 30,
-                        height: 30,
+                        width: 35,
+                        height: 35,
+                        type: 'spike'
+                    });
+                }
+            } else if (data.type === '9spike') {
+                // 9 spikes in a row - create individual spikes
+                const yPos = data.y !== undefined ? (this.ground - data.y) : (this.ground - 35);
+                for (let i = 0; i < 9; i++) {
+                    this.obstacles.push({
+                        x: data.x + (i * 35),
+                        y: yPos,
+                        width: 35,
+                        height: 35,
                         type: 'spike'
                     });
                 }
